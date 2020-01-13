@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1059122995607",
+    "firebase_url": "https://whatsappagora-78084.firebaseio.com",
+    "project_id": "whatsappagora-78084",
+    "storage_bucket": "whatsappagora-78084.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059122995607:android:0bbecfeb70b2fa5d9d24d2",
+        "android_client_info": {
+          "package_name": "com.example.whatsappagora"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1059122995607-gqf0qe9pvf7sn2ve33vvud5rkklfvsie.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.whatsappagora",
+            "certificate_hash": "442aa8d057948b346e6f8d2921c9f165beab07f8"
+          }
+        },
+        {
+          "client_id": "1059122995607-ql7qsq89mr627etrhsmd4ga1qjkl98vv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDanuUb1moOzSJ3kkWd2JaAzybaulhW698"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1059122995607-ql7qsq89mr627etrhsmd4ga1qjkl98vv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

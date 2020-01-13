@@ -89,12 +89,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Intent intent = new Intent(LoginActivity.this, VideoActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, ChannelActivity.class);
                     intent.putExtra("Uid", acct.getId());
+                    intent.putExtra("UName", acct.getDisplayName());
                     startActivity(intent);
                 }
             }, 1000);
         }else {
+            //handle failure
         }
     }
 

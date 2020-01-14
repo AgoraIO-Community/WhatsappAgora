@@ -23,8 +23,8 @@ import io.agora.rtc.video.VideoCanvas;
 
 public class VideoActivity extends AppCompatActivity {
 
-    private String Uid, UName, channelName;
-
+    private String channelName;
+    private User user;
     private static final String TAG = VideoActivity.class.getName();
 
     private static final int PERMISSION_REQ_ID = 22;
@@ -55,6 +55,7 @@ public class VideoActivity extends AppCompatActivity {
                 public void run() {
                     Toast.makeText(VideoActivity.this, "User: " + uid + " join!", Toast.LENGTH_LONG).show();
                     Log.i("agora","Join channel success, uid: " + (uid & 0xFFFFFFFFL));
+                    user.setAgoraUid(uid);
                 }
             });
         }
@@ -107,9 +108,9 @@ public class VideoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
 
-        Uid = getIntent().getExtras().getString("Uid");
+
         channelName = getIntent().getExtras().getString("Channel");
-        UName = getIntent().getExtras().getString("UName");
+        user = getIntent().getExtras().getParcelable("User");
 
         initUI();
 
@@ -270,7 +271,7 @@ public class VideoActivity extends AppCompatActivity {
     public void onRemoteShackClicked(View view) {
         //send message to the other user with data = {1}
         //mRtcEngine.sendStreamMessage(mRtcEngine.createDataStream(true, true), new byte[]{1});
-        Toast.makeText(this, "" + Uid, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "" + user.getFireUid(), Toast.LENGTH_SHORT).show();
     }
 
     public void performAnimation() {

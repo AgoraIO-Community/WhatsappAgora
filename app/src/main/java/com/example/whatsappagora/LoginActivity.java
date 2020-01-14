@@ -85,13 +85,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             acct = result.getSignInAccount();
             statusTextView.setText("Hello, " + acct.getDisplayName() + " with id: " + acct.getId());
 
+            final User user = new User(acct.getId());
+            user.setFireDisplayName(acct.getDisplayName());
+
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+
                     Intent intent = new Intent(LoginActivity.this, ChannelActivity.class);
-                    intent.putExtra("Uid", acct.getId());
-                    intent.putExtra("UName", acct.getDisplayName());
+                    intent.putExtra("User", user);
                     startActivity(intent);
                 }
             }, 1000);

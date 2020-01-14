@@ -11,15 +11,15 @@ import android.widget.Toast;
 public class ChannelActivity extends AppCompatActivity {
 
     EditText editText;
-    String Uid, UName;
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_channel);
         editText = findViewById(R.id.channel_edit_text);
-        Uid = getIntent().getExtras().getString("Uid");
-        UName = getIntent().getExtras().getString("UName");
+
+        user = getIntent().getExtras().getParcelable("User");
     }
 
     public void onJoinChannelClicked(View view) {
@@ -28,8 +28,7 @@ public class ChannelActivity extends AppCompatActivity {
             Toast.makeText(this, "Please Enter Channel Name.", Toast.LENGTH_SHORT).show();
         }else {
             Intent intent = new Intent(ChannelActivity.this, VideoActivity.class);
-            intent.putExtra("Uid", Uid);
-            intent.putExtra("UName", UName);
+            intent.putExtra("User", user);
             intent.putExtra("Channel", channel);
             startActivity(intent);
         }

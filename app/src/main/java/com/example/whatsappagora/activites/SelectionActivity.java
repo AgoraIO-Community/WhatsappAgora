@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatCheckBox;
 
 import com.example.whatsappagora.R;
 import com.example.whatsappagora.model.User;
@@ -109,7 +108,13 @@ public class SelectionActivity extends AppCompatActivity {
     }
 
     public void onClickCall(View view) {
-        //todo: implement this.
+        String myName = user.getFireDisplayName();
+        String targetName = mNameEditText.getText().toString();
+        String channelName = myName.compareTo(targetName) < 0 ? myName + targetName : targetName + myName;
+        Intent intent = new Intent(this, VideoActivity.class);
+        intent.putExtra("User", user);
+        intent.putExtra("Channel", channelName);
+        startActivity(intent);
     }
 
     @Override

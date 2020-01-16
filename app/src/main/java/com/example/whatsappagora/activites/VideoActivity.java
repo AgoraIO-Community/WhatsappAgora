@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.whatsappagora.R;
 import com.example.whatsappagora.model.User;
+import com.example.whatsappagora.utils.MessageUtil;
 
 import io.agora.rtc.IRtcEngineEventHandler;
 import io.agora.rtc.RtcEngine;
@@ -218,8 +219,8 @@ public class VideoActivity extends AppCompatActivity {
             finishCalling();
             isCalling = false;
             mCallBtn.setImageResource(R.drawable.btn_startcall);
-            Intent intent = new Intent(this, ChannelActivity.class);
-            intent.putExtra("User", user);
+            Intent intent = new Intent(this, SelectionActivity.class);
+            intent.putExtra(MessageUtil.INTENT_EXTRA_USER_ID, user);
             startActivity(intent);
         }else {
             //start the call

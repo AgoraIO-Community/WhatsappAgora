@@ -1,4 +1,4 @@
-package com.example.whatsappagora;
+package com.example.whatsappagora.activites;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -11,11 +11,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.example.whatsappagora.R;
+import com.example.whatsappagora.model.User;
 
 import io.agora.rtc.IRtcEngineEventHandler;
 import io.agora.rtc.RtcEngine;
@@ -216,6 +218,9 @@ public class VideoActivity extends AppCompatActivity {
             finishCalling();
             isCalling = false;
             mCallBtn.setImageResource(R.drawable.btn_startcall);
+            Intent intent = new Intent(this, ChannelActivity.class);
+            intent.putExtra("User", user);
+            startActivity(intent);
         }else {
             //start the call
             startCalling();

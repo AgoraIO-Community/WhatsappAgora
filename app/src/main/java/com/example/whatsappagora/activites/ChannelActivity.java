@@ -1,4 +1,4 @@
-package com.example.whatsappagora;
+package com.example.whatsappagora.activites;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.whatsappagora.R;
+import com.example.whatsappagora.model.User;
 
 public class ChannelActivity extends AppCompatActivity {
 

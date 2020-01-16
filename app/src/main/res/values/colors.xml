@@ -6,4 +6,13 @@
 
     <color name="localBackground">#827b92</color>
     <color name="remoteBackground">#484258</color>
+
+    <color name="blue">#32c5f3</color>
+    <color name="white">#fff</color>
+    <color name="black">#000</color>
+    <color name="green">#4ACC60</color>
+    <color name="pink">#6A2290</color>
+    <color name="pink_dark">#4B0082</color>
+    <color name="yellow">#FF7F24</color>
+
 </resources>

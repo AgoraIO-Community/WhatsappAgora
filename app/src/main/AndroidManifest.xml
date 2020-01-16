@@ -13,15 +13,18 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".rtm.AGApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ChannelActivity"></activity>
-        <activity android:name=".VideoActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".activites.SelectionActivity"></activity>
+        <activity android:name=".activites.ChannelActivity" />
+        <activity android:name=".activites.VideoActivity" />
+        <activity android:name=".activites.MessageActivity"></activity>
+        <activity android:name=".activites.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

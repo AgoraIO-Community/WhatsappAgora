@@ -9,4 +9,6 @@
     <dimen name="call_button_size">60dp</dimen>
     <dimen name="other_button_size">54dp</dimen>
 
+    <dimen name="video_indicator_bottom_margin">20dp</dimen>
+
 </resources>

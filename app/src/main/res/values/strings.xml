@@ -36,5 +36,8 @@
 
     <string name="login_failed">Login failed</string>
 
+    <string name="bit_rate_value_with_unit">%d kbps</string>
+    <string name="frame_rate_value_with_unit">%d fps</string>
+
 
 </resources>

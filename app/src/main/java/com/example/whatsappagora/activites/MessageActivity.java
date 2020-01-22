@@ -151,7 +151,7 @@ public class MessageActivity extends AppCompatActivity {
         if (mIsPeerToPeerMode) {
             MessageUtil.addMessageListBeanList(new MessageListBean(mPeerId, mMessageBeanList));
         } else {
-            leaveAndReleaseChannel();
+            leaveChannel();
         }
         mChatManager.unregisterListener(mClientListener);
     }
@@ -159,10 +159,19 @@ public class MessageActivity extends AppCompatActivity {
     /**
      * API CALL: leave and release channel
      */
-    private void leaveAndReleaseChannel() {
+    private void leaveChannel() {
         if (mRtmChannel != null) {
-            mRtmChannel.leave(null);
-            mRtmChannel.release();
+            mRtmChannel.leave(new ResultCallback<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+
+                }
+
+                @Override
+                public void onFailure(ErrorInfo errorInfo) {
+                    showToast("leve channel failed");
+                }
+            });
             mRtmChannel = null;
         }
     }

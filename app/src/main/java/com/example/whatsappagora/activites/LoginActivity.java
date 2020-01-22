@@ -113,11 +113,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 }
 
                 @Override
-                public void onFailure(ErrorInfo errorInfo) {
+                public void onFailure(final ErrorInfo errorInfo) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(LoginActivity.this, getString(R.string.login_failed), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, getString(R.string.login_failed) + " " + errorInfo.getErrorDescription(), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -135,14 +135,19 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         statusTextView.setText("Connection Failed: " + connectionResult);
     }
 
-    private void signOut() {
+    public void signOut() {
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(@NonNull Status status) {
                 if (status.equals(Status.RESULT_SUCCESS)) {
                     statusTextView.setText("Signed Out successfully");
+                }else {
+                    statusTextView.setText("Signout Failed. " + status.getStatusMessage());
                 }
             }
         });
+
+        mRtmClient.logout(null);
+        MessageUtil.cleanMessageListBeanList();
     }
 }

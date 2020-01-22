@@ -15,4 +15,6 @@
     <color name="pink_dark">#4B0082</color>
     <color name="yellow">#FF7F24</color>
 
+    <color name="transparent_75_white">#ACFFFFFF</color>
+
 </resources>

@@ -1,25 +1,29 @@
 package com.example.whatsappagora.activites;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.whatsappagora.R;
-import com.example.whatsappagora.model.User;
-import com.example.whatsappagora.utils.MessageUtil;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import com.example.whatsappagora.R;
+import com.example.whatsappagora.layout.GridVideoViewContainer;
+import com.example.whatsappagora.model.User;
+import com.example.whatsappagora.ui.RecyclerItemClickListener;
+
+import java.util.HashMap;
+
+import io.agora.rtc.Constants;
 import io.agora.rtc.IRtcEngineEventHandler;
 import io.agora.rtc.RtcEngine;
 import io.agora.rtc.video.VideoCanvas;
@@ -32,14 +36,17 @@ public class VideoActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQ_ID = 22;
     RtcEngine mRtcEngine;
-    private RelativeLayout mRemoteContainer;
-    private SurfaceView mRemoteView;
-    private FrameLayout mLocalContainer;
     private SurfaceView mLocalView;
     private ImageView mCallBtn, mMuteBtn, mSwitchVoiceBtn;
+    private GridVideoViewContainer mGridVideoViewContainer;
     private boolean isCalling = true;
     private boolean isMuted = false;
     private boolean isVoiceChanged = false;
+    private boolean mIsLandscape = false;
+
+
+    private final HashMap<Integer, SurfaceView> mUidsList = new HashMap<>(); // uid = 0 || uid == EngineConfig.mUid
+
 
     // Ask for Android device permissions at runtime.
     private static final String[] REQUESTED_PERMISSIONS = {
@@ -57,8 +64,10 @@ public class VideoActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     Toast.makeText(VideoActivity.this, "User: " + uid + " join!", Toast.LENGTH_LONG).show();
-                    Log.i("agora","Join channel success, uid: " + (uid & 0xFFFFFFFFL));
+                    Log.i("agora", "Join channel success, uid: " + (uid & 0xFFFFFFFFL));
                     user.setAgoraUid(uid);
+                    SurfaceView localView = mUidsList.remove(0);
+                    mUidsList.put(uid, localView);
                 }
             });
         }
@@ -71,7 +80,7 @@ public class VideoActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i("agora","First remote video decoded, uid: " + (uid & 0xFFFFFFFFL));
+                    Log.i("agora", "First remote video decoded, uid: " + (uid & 0xFFFFFFFFL));
                     setupRemoteVideo(uid);
                 }
             });
@@ -85,30 +94,23 @@ public class VideoActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     Toast.makeText(VideoActivity.this, "User: " + uid + " left the room.", Toast.LENGTH_LONG).show();
-                    Log.i("agora","User offline, uid: " + (uid & 0xFFFFFFFFL));
-                    onRemoteUserLeft();
+                    Log.i("agora", "User offline, uid: " + (uid & 0xFFFFFFFFL));
+                    onRemoteUserLeft(uid);
                 }
             });
-        }
-
-        @Override
-        public void onStreamMessage(int uid, int streamId, byte[] data) {
-            super.onStreamMessage(uid, streamId, data);
-            //do shacking when receive 1
-            if (data.length == 1 && data[0] == 1) {
-                performAnimation();
-            }
-        }
-
-        @Override
-        public void onStreamMessageError(int uid, int streamId, int error, int missed, int cached) {
-            super.onStreamMessageError(uid, streamId, error, missed, cached);
         }
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.hide();
+        }
         setContentView(R.layout.activity_video);
 
 
@@ -125,12 +127,27 @@ public class VideoActivity extends AppCompatActivity {
     }
 
     private void initUI() {
-        mLocalContainer = findViewById(R.id.local_video_view_container);
-        mRemoteContainer = findViewById(R.id.remote_video_view_container);
-
         mCallBtn = findViewById(R.id.btn_call);
         mMuteBtn = findViewById(R.id.btn_mute);
         mSwitchVoiceBtn = findViewById(R.id.btn_switch_voice);
+
+        mGridVideoViewContainer = findViewById(R.id.grid_video_view_container);
+        mGridVideoViewContainer.setItemEventHandler(new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                //todo: add click event
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                //todo: add long click event
+            }
+
+            @Override
+            public void onItemDoubleClick(View view, int position) {
+                // TODO: 2020-01-20 add double click event
+            }
+        });
     }
 
     private void initEngineAndJoinChannel() {
@@ -150,18 +167,23 @@ public class VideoActivity extends AppCompatActivity {
 
     private void setupLocalVideo() {
 
-        // Enable the video module.
-        mRtcEngine.enableVideo();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRtcEngine.enableVideo();
+                mRtcEngine.enableInEarMonitoring(true);
+                mRtcEngine.setInEarMonitoringVolume(80);
 
-        mRtcEngine.enableInEarMonitoring(true);
-        mRtcEngine.setInEarMonitoringVolume(80);
+                SurfaceView surfaceView = RtcEngine.CreateRendererView(getBaseContext());
+                mRtcEngine.setupLocalVideo(new VideoCanvas(surfaceView, VideoCanvas.RENDER_MODE_HIDDEN, 0));
+                surfaceView.setZOrderOnTop(false);
+                surfaceView.setZOrderMediaOverlay(false);
 
-        mLocalView = RtcEngine.CreateRendererView(getBaseContext());
-        mLocalView.setZOrderMediaOverlay(true);
-        mLocalContainer.addView(mLocalView);
-        // Set the local video view.
-        VideoCanvas localVideoCanvas = new VideoCanvas(mLocalView, VideoCanvas.RENDER_MODE_HIDDEN, 0);
-        mRtcEngine.setupLocalVideo(localVideoCanvas);
+                mUidsList.put(0, surfaceView);
+
+                mGridVideoViewContainer.initViewContainer(VideoActivity.this, 0, mUidsList, mIsLandscape);
+            }
+        });
     }
 
     private void joinChannel() {
@@ -178,25 +200,66 @@ public class VideoActivity extends AppCompatActivity {
         return true;
     }
 
-    private void onRemoteUserLeft() {
-        removeRemoteVideo();
+    private void onRemoteUserLeft(int uid) {
+        removeRemoteVideo(uid);
     }
 
-    private void removeRemoteVideo() {
-        if (mRemoteView != null) {
-            mRemoteContainer.removeView(mRemoteView);
+    private void removeRemoteVideo(final int uid) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //todo: remove view
+                Object target = mUidsList.remove(uid);
+                if (target == null) {
+                    return;
+                }
+
+                switchToDefaultVideoView();
+            }
+        });
+
+    }
+
+    private void setupRemoteVideo(final int uid) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                SurfaceView mRemoteView = RtcEngine.CreateRendererView(getApplicationContext());
+
+                mUidsList.put(uid, mRemoteView);
+
+                mRemoteView.setZOrderOnTop(true);
+                mRemoteView.setZOrderMediaOverlay(true);
+                // Set the remote video view.
+                mRtcEngine.setupRemoteVideo(new VideoCanvas(mRemoteView, VideoCanvas.RENDER_MODE_HIDDEN, uid));
+
+                switchToDefaultVideoView();
+            }
+        });
+    }
+
+    private void switchToDefaultVideoView() {
+
+        mGridVideoViewContainer.initViewContainer(VideoActivity.this, user.getAgoraUid(), mUidsList, mIsLandscape);
+
+        boolean setRemoteUserPriorityFlag = false;
+
+        int sizeLimit = mUidsList.size();
+        if (sizeLimit > 5) {
+            sizeLimit = 5;
         }
-        mRemoteView = null;
-    }
 
-    private void setupRemoteVideo(int uid) {
-
-        mRemoteView = RtcEngine.CreateRendererView(getBaseContext());
-        mRemoteContainer.addView(mRemoteView);
-        // Set the remote video view.
-        mRtcEngine.setupRemoteVideo(new VideoCanvas(mRemoteView, VideoCanvas.RENDER_MODE_HIDDEN, uid));
-        mRemoteView.setTag(uid);
-
+        for (int i = 0; i < sizeLimit; i++) {
+            int uid = mGridVideoViewContainer.getItem(i).mUid;
+            if (user.getAgoraUid() != uid) {
+                if (!setRemoteUserPriorityFlag) {
+                    setRemoteUserPriorityFlag = true;
+                    mRtcEngine.setRemoteUserPriority(uid, Constants.USER_PRIORITY_HIGH);
+                } else {
+                    mRtcEngine.setRemoteUserPriority(uid, Constants.USER_PRIORITY_NORANL);
+                }
+            }
+        }
     }
 
     @Override
@@ -219,10 +282,11 @@ public class VideoActivity extends AppCompatActivity {
             finishCalling();
             isCalling = false;
             mCallBtn.setImageResource(R.drawable.btn_startcall);
-            Intent intent = new Intent(this, SelectionActivity.class);
-            intent.putExtra(MessageUtil.INTENT_EXTRA_USER_ID, user);
-            startActivity(intent);
-        }else {
+            finish();
+//            Intent intent = new Intent(this, SelectionActivity.class);
+//            intent.putExtra(MessageUtil.INTENT_EXTRA_USER_ID, user);
+//            startActivity(intent);
+        } else {
             //start the call
             startCalling();
             isCalling = true;
@@ -231,16 +295,8 @@ public class VideoActivity extends AppCompatActivity {
     }
 
     private void finishCalling() {
-        removeLocalVideo();
-        removeRemoteVideo();
         leaveChannel();
-    }
-
-    private void removeLocalVideo() {
-        if (mLocalView != null) {
-            mLocalContainer.removeView(mLocalView);
-        }
-        mLocalView = null;
+        mUidsList.clear();
     }
 
     private void startCalling() {
@@ -264,7 +320,7 @@ public class VideoActivity extends AppCompatActivity {
             //start voice change to little girl, can be changed to different voices
             mRtcEngine.setLocalVoiceChanger(3);
             Toast.makeText(this, "Voice changer activate", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
             //disable voice change
             Toast.makeText(this, "Voice back to normal", Toast.LENGTH_SHORT).show();
             mRtcEngine.setLocalVoiceReverbPreset(0);

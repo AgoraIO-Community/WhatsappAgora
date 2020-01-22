@@ -55,16 +55,12 @@ public class SelectionActivity extends AppCompatActivity {
                 switch (checkedId) {
                     case R.id.peer_radio_button:
                         mIsPeerToPeerMode = true;
-                        mCallButton.setVisibility(View.VISIBLE);
-                        mCallButton.setClickable(true);
                         mTitleTextView.setText(getString(R.string.title_peer));
                         mChatButton.setText(getString(R.string.btn_chat));
                         mNameEditText.setHint(getString(R.string.hint_friend));
                         break;
                     case R.id.selection_tab_channel:
                         mIsPeerToPeerMode = false;
-                        mCallButton.setVisibility(View.INVISIBLE);
-                        mCallButton.setClickable(false);
                         mTitleTextView.setText(getString(R.string.title_channel));
                         mChatButton.setText(getString(R.string.btn_join));
                         mNameEditText.setHint(getString(R.string.hint_channel));
@@ -110,7 +106,13 @@ public class SelectionActivity extends AppCompatActivity {
     public void onClickCall(View view) {
         String myName = user.getFireDisplayName();
         String targetName = mNameEditText.getText().toString();
-        String channelName = myName.compareTo(targetName) < 0 ? myName + targetName : targetName + myName;
+        String channelName = "";
+        if (mIsPeerToPeerMode) {
+            channelName = myName.compareTo(targetName) < 0 ? myName + targetName : targetName + myName;
+
+        }else {
+            channelName = targetName;
+        }
         Intent intent = new Intent(this, VideoActivity.class);
         intent.putExtra("User", user);
         intent.putExtra("Channel", channelName);

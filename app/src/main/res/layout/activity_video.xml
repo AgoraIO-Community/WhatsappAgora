@@ -80,8 +80,8 @@
             android:layout_toEndOf="@id/btn_switch_camera"
             android:layout_marginLeft="@dimen/control_bottom_horizontal_margin"
             android:layout_centerVertical="true"
-            android:onClick="onRemoteShackClicked"
-            android:src="@drawable/btn_shack"
+            android:onClick="onVideoChatClicked"
+            android:src="@drawable/ic_comment_blue_24dp"
             android:scaleType="centerCrop"/>
     </RelativeLayout>
 

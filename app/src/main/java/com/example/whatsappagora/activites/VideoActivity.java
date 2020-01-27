@@ -1,6 +1,7 @@
 package com.example.whatsappagora.activites;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +29,7 @@ import com.example.whatsappagora.model.User;
 import com.example.whatsappagora.model.UserStatusData;
 import com.example.whatsappagora.ui.RecyclerItemClickListener;
 import com.example.whatsappagora.ui.RtlLinearLayoutManager;
+import com.example.whatsappagora.utils.MessageUtil;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,6 +38,8 @@ import io.agora.rtc.Constants;
 import io.agora.rtc.IRtcEngineEventHandler;
 import io.agora.rtc.RtcEngine;
 import io.agora.rtc.video.VideoCanvas;
+
+import static com.example.whatsappagora.utils.MessageUtil.INTENT_EXTRA_IS_PEER_MODE;
 
 public class VideoActivity extends AppCompatActivity {
     public static final int LAYOUT_TYPE_DEFAULT = 0;
@@ -56,7 +60,8 @@ public class VideoActivity extends AppCompatActivity {
     private boolean mIsLandscape = false;
     private RelativeLayout mSmallVideoViewDock;
     private SmallVideoViewAdapter mSmallVideoViewAdapter;
-
+    private boolean mIsPeerToPeerMode = true;
+    private String mActualTarget;
 
     private final HashMap<Integer, SurfaceView> mUidsList = new HashMap<>(); // uid = 0 || uid == EngineConfig.mUid
 
@@ -129,7 +134,8 @@ public class VideoActivity extends AppCompatActivity {
 
         channelName = getIntent().getExtras().getString("Channel");
         user = getIntent().getExtras().getParcelable("User");
-
+        mIsPeerToPeerMode = getIntent().getBooleanExtra(MessageUtil.INTENT_EXTRA_IS_PEER_MODE, true);
+        mActualTarget = getIntent().getExtras().getString("Actual Target");
         initUI();
 
         if (checkSelfPermission(REQUESTED_PERMISSIONS[0], PERMISSION_REQ_ID) &&
@@ -446,14 +452,19 @@ public class VideoActivity extends AppCompatActivity {
         isVoiceChanged = !isVoiceChanged;
     }
 
-    public void onRemoteShackClicked(View view) {
-        //send message to the other user with data = {1}
-        //mRtcEngine.sendStreamMessage(mRtcEngine.createDataStream(true, true), new byte[]{1});
-        Toast.makeText(this, "" + user.getFireUid(), Toast.LENGTH_SHORT).show();
+    public void onVideoChatClicked(View view) {
+        jumpToMessageActivity();
     }
 
-    public void performAnimation() {
-        //mRemoteContainer.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake));
+    private void jumpToMessageActivity() {
+        Intent intent = new Intent(this, MessageActivity.class);
+        intent.putExtra(INTENT_EXTRA_IS_PEER_MODE, mIsPeerToPeerMode);
+        if (!mIsPeerToPeerMode) {
+            intent.putExtra(MessageUtil.INTENT_EXTRA_TARGET_NAME, channelName);
+        }else {
+            intent.putExtra(MessageUtil.INTENT_EXTRA_TARGET_NAME, mActualTarget);
+        }
+        intent.putExtra(MessageUtil.INTENT_EXTRA_USER_ID, user);
+        startActivity(intent);
     }
-
 }

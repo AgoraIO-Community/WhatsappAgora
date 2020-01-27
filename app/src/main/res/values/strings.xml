@@ -2,6 +2,7 @@
     <string name="app_name">WhatsappAgora</string>
     <string name="agora_app_id">b01d0386c32a48e4a4ffee7184227607</string>
 
+    <string name="welcome_title">Login Into Agora</string>
     <string name="title_peer">Peer to peer</string>
     <string name="title_channel">Channel</string>
 

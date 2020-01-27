@@ -116,6 +116,8 @@ public class SelectionActivity extends AppCompatActivity {
         Intent intent = new Intent(this, VideoActivity.class);
         intent.putExtra("User", user);
         intent.putExtra("Channel", channelName);
+        intent.putExtra(MessageUtil.INTENT_EXTRA_IS_PEER_MODE, mIsPeerToPeerMode);
+        intent.putExtra("Actual Target", targetName);
         startActivity(intent);
     }
 

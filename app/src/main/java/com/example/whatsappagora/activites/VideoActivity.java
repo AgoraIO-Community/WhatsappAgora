@@ -6,22 +6,31 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.whatsappagora.R;
 import com.example.whatsappagora.layout.GridVideoViewContainer;
+import com.example.whatsappagora.layout.SmallVideoViewAdapter;
+import com.example.whatsappagora.layout.SmallVideoViewDecoration;
 import com.example.whatsappagora.model.User;
+import com.example.whatsappagora.model.UserStatusData;
 import com.example.whatsappagora.ui.RecyclerItemClickListener;
+import com.example.whatsappagora.ui.RtlLinearLayoutManager;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import io.agora.rtc.Constants;
 import io.agora.rtc.IRtcEngineEventHandler;
@@ -29,11 +38,13 @@ import io.agora.rtc.RtcEngine;
 import io.agora.rtc.video.VideoCanvas;
 
 public class VideoActivity extends AppCompatActivity {
+    public static final int LAYOUT_TYPE_DEFAULT = 0;
+    public static final int LAYOUT_TYPE_SMALL = 1;
 
     private String channelName;
     private User user;
     private static final String TAG = VideoActivity.class.getName();
-
+    public int mLayoutType = LAYOUT_TYPE_DEFAULT;
     private static final int PERMISSION_REQ_ID = 22;
     RtcEngine mRtcEngine;
     private SurfaceView mLocalView;
@@ -43,6 +54,8 @@ public class VideoActivity extends AppCompatActivity {
     private boolean isMuted = false;
     private boolean isVoiceChanged = false;
     private boolean mIsLandscape = false;
+    private RelativeLayout mSmallVideoViewDock;
+    private SmallVideoViewAdapter mSmallVideoViewAdapter;
 
 
     private final HashMap<Integer, SurfaceView> mUidsList = new HashMap<>(); // uid = 0 || uid == EngineConfig.mUid
@@ -145,9 +158,110 @@ public class VideoActivity extends AppCompatActivity {
 
             @Override
             public void onItemDoubleClick(View view, int position) {
-                // TODO: 2020-01-20 add double click event
-            }
+                onBigVideoViewDoubleClicked(view, position);            }
         });
+    }
+
+    private void onBigVideoViewDoubleClicked(View view, int position) {
+        if (mUidsList.size() < 2) {
+            return;
+        }
+
+        UserStatusData user = mGridVideoViewContainer.getItem(position);
+        int uid = (user.mUid == 0) ? this.user.getAgoraUid() : user.mUid;
+
+        if (mLayoutType == LAYOUT_TYPE_DEFAULT && mUidsList.size() != 1) {
+            switchToSmallVideoView(uid);
+        } else {
+            switchToDefaultVideoView();
+        }
+    }
+
+    private void switchToSmallVideoView(int bigBgUid) {
+        HashMap<Integer, SurfaceView> slice = new HashMap<>(1);
+        slice.put(bigBgUid, mUidsList.get(bigBgUid));
+        Iterator<SurfaceView> iterator = mUidsList.values().iterator();
+        while (iterator.hasNext()) {
+            SurfaceView s = iterator.next();
+            s.setZOrderOnTop(true);
+            s.setZOrderMediaOverlay(true);
+        }
+
+        mUidsList.get(bigBgUid).setZOrderOnTop(false);
+        mUidsList.get(bigBgUid).setZOrderMediaOverlay(false);
+
+        mGridVideoViewContainer.initViewContainer(this, bigBgUid, slice, mIsLandscape);
+
+        bindToSmallVideoView(bigBgUid);
+
+        mLayoutType = LAYOUT_TYPE_SMALL;
+    }
+
+    private void bindToSmallVideoView(int exceptUid) {
+        if (mSmallVideoViewDock == null) {
+            ViewStub stub = (ViewStub) findViewById(R.id.small_video_view_dock);
+            mSmallVideoViewDock = (RelativeLayout) stub.inflate();
+        }
+
+        boolean twoWayVideoCall = mUidsList.size() == 2;
+
+        RecyclerView recycler = (RecyclerView) findViewById(R.id.small_video_view_container);
+
+        boolean create = false;
+
+        if (mSmallVideoViewAdapter == null) {
+            create = true;
+            mSmallVideoViewAdapter = new SmallVideoViewAdapter(this, this.user.getAgoraUid(), exceptUid, mUidsList);
+            mSmallVideoViewAdapter.setHasStableIds(true);
+        }
+        recycler.setHasFixedSize(true);
+
+        if (twoWayVideoCall) {
+            recycler.setLayoutManager(new RtlLinearLayoutManager(getApplicationContext(), RtlLinearLayoutManager.HORIZONTAL, false));
+        } else {
+            recycler.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
+        }
+        recycler.addItemDecoration(new SmallVideoViewDecoration());
+        recycler.setAdapter(mSmallVideoViewAdapter);
+        recycler.addOnItemTouchListener(new RecyclerItemClickListener(getBaseContext(), new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+
+            @Override
+            public void onItemDoubleClick(View view, int position) {
+                onSmallVideoViewDoubleClicked(view, position);
+            }
+        }));
+
+        recycler.setDrawingCacheEnabled(true);
+        recycler.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
+
+        if (!create) {
+            mSmallVideoViewAdapter.setLocalUid(this.user.getAgoraUid());
+            mSmallVideoViewAdapter.notifyUiChanged(mUidsList, exceptUid, null, null);
+        }
+        for (Integer tempUid : mUidsList.keySet()) {
+            if (this.user.getAgoraUid() != tempUid) {
+                if (tempUid == exceptUid) {
+                    mRtcEngine.setRemoteUserPriority(tempUid, Constants.USER_PRIORITY_HIGH);
+                } else {
+                    mRtcEngine.setRemoteUserPriority(tempUid, Constants.USER_PRIORITY_NORANL);
+                }
+            }
+        }
+        recycler.setVisibility(View.VISIBLE);
+        mSmallVideoViewDock.setVisibility(View.VISIBLE);
+    }
+
+    private void onSmallVideoViewDoubleClicked(View view, int position) {
+        switchToDefaultVideoView();
     }
 
     private void initEngineAndJoinChannel() {
@@ -243,6 +357,8 @@ public class VideoActivity extends AppCompatActivity {
         mGridVideoViewContainer.initViewContainer(VideoActivity.this, user.getAgoraUid(), mUidsList, mIsLandscape);
 
         boolean setRemoteUserPriorityFlag = false;
+
+        mLayoutType = LAYOUT_TYPE_DEFAULT;
 
         int sizeLimit = mUidsList.size();
         if (sizeLimit > 5) {

@@ -15,11 +15,8 @@ import java.util.HashMap;
 
 public class GridVideoViewContainerAdapter extends VideoViewAdapter {
 
-    //private final static Logger log = LoggerFactory.getLogger(GridVideoViewContainerAdapter.class);
-
     public GridVideoViewContainerAdapter(Activity activity, int localUid, HashMap<Integer, SurfaceView> uids) {
         super(activity, localUid, uids);
-        //log.debug("GridVideoViewContainerAdapter " + (mLocalUid & 0xFFFFFFFFL));
     }
 
     @Override
@@ -66,9 +63,6 @@ public class GridVideoViewContainerAdapter extends VideoViewAdapter {
         VideoViewAdapterUtil.composeDataItem(mUsers, uids, localUid, status, volume, mVideoInfo);
 
         notifyDataSetChanged();
-//        if (DEBUG) {
-//            log.debug("notifyUiChanged " + (mLocalUid & 0xFFFFFFFFL) + " " + (localUid & 0xFFFFFFFFL) + " " + uids + " " + status + " " + volume);
-//        }
     }
 
     @Override

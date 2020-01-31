@@ -20,36 +20,23 @@ import java.util.Iterator;
 
 public class VideoViewAdapterUtil {
 
-    //private final static Logger log = LoggerFactory.getLogger(VideoViewAdapterUtil.class);
-
     private static final boolean DEBUG = false;
 
     public static void composeDataItem1(final ArrayList<UserStatusData> users, HashMap<Integer, SurfaceView> uids, int localUid) {
         for (HashMap.Entry<Integer, SurfaceView> entry : uids.entrySet()) {
-//            if (DEBUG) {
-//                log.debug("composeDataItem1 " + (entry.getKey() & 0xFFFFFFFFL) + " " + (localUid & 0xFFFFFFFFL) + " " + users.size() + " " + entry.getValue());
-//            }
-
             SurfaceView surfaceV = entry.getValue();
             surfaceV.setZOrderOnTop(false);
             surfaceV.setZOrderMediaOverlay(false);
             searchUidsAndAppend(users, entry, localUid, UserStatusData.DEFAULT_STATUS, UserStatusData.DEFAULT_VOLUME, null);
-
         }
 
         removeNotExisted(users, uids, localUid);
     }
 
     private static void removeNotExisted(ArrayList<UserStatusData> users, HashMap<Integer, SurfaceView> uids, int localUid) {
-//        if (DEBUG) {
-//            log.debug("removeNotExisted all " + uids + " " + users.size());
-//        }
         Iterator<UserStatusData> it = users.iterator();
         while (it.hasNext()) {
             UserStatusData user = it.next();
-//            if (DEBUG) {
-//                log.debug("removeNotExisted " + user + " " + localUid);
-//            }
             if (uids.get(user.mUid) == null && user.mUid != localUid) {
                 it.remove();
             }
@@ -142,9 +129,6 @@ public class VideoViewAdapterUtil {
             } else {
                 i = null;
             }
-//            if (DEBUG) {
-//                log.debug("composeDataItem " + users + " " + entry + " " + (localUid & 0XFFFFFFFFL) + " " + s + " " + v + " " + i + " " + local + " " + (uid & 0XFFFFFFFFL) + " " + (uidExcepted & 0XFFFFFFFFL));
-//            }
             searchUidsAndAppend(users, entry, localUid, s, v, i);
         }
 
@@ -152,10 +136,6 @@ public class VideoViewAdapterUtil {
     }
 
     public static void renderExtraData(Context context, UserStatusData user, VideoUserStatusHolder myHolder) {
-//        if (DEBUG) {
-//            log.debug("renderExtraData " + user + " " + myHolder);
-//        }
-
         if (user.mStatus != null) {
             if ((user.mStatus & UserStatusData.VIDEO_MUTED) != 0) {
                 myHolder.mAvatar.setVisibility(View.VISIBLE);

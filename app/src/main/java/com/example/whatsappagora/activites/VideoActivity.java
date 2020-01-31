@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewStub;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -51,7 +50,6 @@ public class VideoActivity extends AppCompatActivity {
     public int mLayoutType = LAYOUT_TYPE_DEFAULT;
     private static final int PERMISSION_REQ_ID = 22;
     RtcEngine mRtcEngine;
-    private SurfaceView mLocalView;
     private ImageView mCallBtn, mMuteBtn, mSwitchVoiceBtn;
     private GridVideoViewContainer mGridVideoViewContainer;
     private boolean isCalling = true;
@@ -63,7 +61,7 @@ public class VideoActivity extends AppCompatActivity {
     private boolean mIsPeerToPeerMode = true;
     private String mActualTarget;
 
-    private final HashMap<Integer, SurfaceView> mUidsList = new HashMap<>(); // uid = 0 || uid == EngineConfig.mUid
+    private final HashMap<Integer, SurfaceView> mUidsList = new HashMap<>();
 
 
     // Ask for Android device permissions at runtime.
@@ -124,18 +122,12 @@ public class VideoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
             ab.hide();
         }
         setContentView(R.layout.activity_video);
-
-
-        channelName = getIntent().getExtras().getString("Channel");
-        user = getIntent().getExtras().getParcelable("User");
-        mIsPeerToPeerMode = getIntent().getBooleanExtra(MessageUtil.INTENT_EXTRA_IS_PEER_MODE, true);
-        mActualTarget = getIntent().getExtras().getString("Actual Target");
+        getExtras();
         initUI();
 
         if (checkSelfPermission(REQUESTED_PERMISSIONS[0], PERMISSION_REQ_ID) &&
@@ -143,6 +135,13 @@ public class VideoActivity extends AppCompatActivity {
                 checkSelfPermission(REQUESTED_PERMISSIONS[2], PERMISSION_REQ_ID)) {
             initEngineAndJoinChannel();
         }
+    }
+
+    private void getExtras() {
+        channelName = getIntent().getExtras().getString("Channel");
+        user = getIntent().getExtras().getParcelable("User");
+        mIsPeerToPeerMode = getIntent().getBooleanExtra(MessageUtil.INTENT_EXTRA_IS_PEER_MODE, true);
+        mActualTarget = getIntent().getExtras().getString("Actual Target");
     }
 
     private void initUI() {
@@ -154,18 +153,68 @@ public class VideoActivity extends AppCompatActivity {
         mGridVideoViewContainer.setItemEventHandler(new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                //todo: add click event
+                //can add single click listener logic
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                //todo: add long click event
+                //can add long click listener logic
             }
 
             @Override
             public void onItemDoubleClick(View view, int position) {
                 onBigVideoViewDoubleClicked(view, position);            }
         });
+    }
+
+    private void initEngineAndJoinChannel() {
+        initializeEngine();
+        setupLocalVideo();
+        joinChannel();
+    }
+
+    private void initializeEngine() {
+        try {
+            mRtcEngine = RtcEngine.create(getBaseContext(), getString(R.string.agora_app_id), mRtcEventHandler);
+        } catch (Exception e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+            throw new RuntimeException("NEED TO check rtc sdk init fatal error\n" + Log.getStackTraceString(e));
+        }
+    }
+
+    private void setupLocalVideo() {
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRtcEngine.enableVideo();
+                mRtcEngine.enableInEarMonitoring(true);
+                mRtcEngine.setInEarMonitoringVolume(80);
+
+                SurfaceView surfaceView = RtcEngine.CreateRendererView(getBaseContext());
+                mRtcEngine.setupLocalVideo(new VideoCanvas(surfaceView, VideoCanvas.RENDER_MODE_HIDDEN, 0));
+                surfaceView.setZOrderOnTop(false);
+                surfaceView.setZOrderMediaOverlay(false);
+
+                mUidsList.put(0, surfaceView);
+
+                mGridVideoViewContainer.initViewContainer(VideoActivity.this, 0, mUidsList, mIsLandscape);
+            }
+        });
+    }
+
+    private void joinChannel() {
+        // Join a channel with a token, token can be null.
+        mRtcEngine.joinChannel(null, channelName, "Extra Optional Data", 0);
+    }
+
+    private boolean checkSelfPermission(String permission, int requestCode) {
+        if (ContextCompat.checkSelfPermission(this, permission) !=
+                PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, REQUESTED_PERMISSIONS, requestCode);
+            return false;
+        }
+        return true;
     }
 
     private void onBigVideoViewDoubleClicked(View view, int position) {
@@ -270,56 +319,6 @@ public class VideoActivity extends AppCompatActivity {
         switchToDefaultVideoView();
     }
 
-    private void initEngineAndJoinChannel() {
-        initializeEngine();
-        setupLocalVideo();
-        joinChannel();
-    }
-
-    private void initializeEngine() {
-        try {
-            mRtcEngine = RtcEngine.create(getBaseContext(), getString(R.string.agora_app_id), mRtcEventHandler);
-        } catch (Exception e) {
-            Log.e(TAG, Log.getStackTraceString(e));
-            throw new RuntimeException("NEED TO check rtc sdk init fatal error\n" + Log.getStackTraceString(e));
-        }
-    }
-
-    private void setupLocalVideo() {
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mRtcEngine.enableVideo();
-                mRtcEngine.enableInEarMonitoring(true);
-                mRtcEngine.setInEarMonitoringVolume(80);
-
-                SurfaceView surfaceView = RtcEngine.CreateRendererView(getBaseContext());
-                mRtcEngine.setupLocalVideo(new VideoCanvas(surfaceView, VideoCanvas.RENDER_MODE_HIDDEN, 0));
-                surfaceView.setZOrderOnTop(false);
-                surfaceView.setZOrderMediaOverlay(false);
-
-                mUidsList.put(0, surfaceView);
-
-                mGridVideoViewContainer.initViewContainer(VideoActivity.this, 0, mUidsList, mIsLandscape);
-            }
-        });
-    }
-
-    private void joinChannel() {
-        // Join a channel with a token.
-        mRtcEngine.joinChannel(null, channelName, "Extra Optional Data", 0);
-    }
-
-    private boolean checkSelfPermission(String permission, int requestCode) {
-        if (ContextCompat.checkSelfPermission(this, permission) !=
-                PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, REQUESTED_PERMISSIONS, requestCode);
-            return false;
-        }
-        return true;
-    }
-
     private void onRemoteUserLeft(int uid) {
         removeRemoteVideo(uid);
     }
@@ -347,10 +346,8 @@ public class VideoActivity extends AppCompatActivity {
                 SurfaceView mRemoteView = RtcEngine.CreateRendererView(getApplicationContext());
 
                 mUidsList.put(uid, mRemoteView);
-
                 mRemoteView.setZOrderOnTop(true);
                 mRemoteView.setZOrderMediaOverlay(true);
-                // Set the remote video view.
                 mRtcEngine.setupRemoteVideo(new VideoCanvas(mRemoteView, VideoCanvas.RENDER_MODE_HIDDEN, uid));
 
                 switchToDefaultVideoView();
@@ -405,9 +402,6 @@ public class VideoActivity extends AppCompatActivity {
             isCalling = false;
             mCallBtn.setImageResource(R.drawable.btn_startcall);
             finish();
-//            Intent intent = new Intent(this, SelectionActivity.class);
-//            intent.putExtra(MessageUtil.INTENT_EXTRA_USER_ID, user);
-//            startActivity(intent);
         } else {
             //start the call
             startCalling();

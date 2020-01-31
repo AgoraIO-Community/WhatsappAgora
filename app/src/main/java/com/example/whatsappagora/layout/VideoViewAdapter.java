@@ -86,10 +86,6 @@ public abstract class VideoViewAdapter extends RecyclerView.Adapter<RecyclerView
 
         final UserStatusData user = mUsers.get(position);
 
-//        if (DEBUG) {
-//            log.debug("onBindViewHolder " + position + " " + user + " " + myHolder + " " + myHolder.itemView + " " + mDefaultChildItem);
-//        }
-
         FrameLayout holderView = (FrameLayout) myHolder.itemView;
 
         if (holderView.getChildCount() == mDefaultChildItem) {
@@ -103,9 +99,6 @@ public abstract class VideoViewAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public int getItemCount() {
-//        if (DEBUG) {
-//            log.debug("getItemCount " + mUsers.size());
-//        }
         return mUsers.size();
     }
 

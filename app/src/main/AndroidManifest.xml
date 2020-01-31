@@ -21,7 +21,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activites.SelectionActivity"></activity>
-        <activity android:name=".activites.ChannelActivity" />
         <activity android:name=".activites.VideoActivity"/>
         <activity android:name=".activites.MessageActivity"></activity>
         <activity android:name=".activites.LoginActivity">

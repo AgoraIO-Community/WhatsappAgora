@@ -50,6 +50,7 @@ public class MessageActivity extends AppCompatActivity {
     private String mPeerId = "";
     private String mChannelName = "";
     private int mChannelMemberCount = 1;
+    private String targetName = "";
 
     private ChatManager mChatManager;
     private RtmClient mRtmClient;
@@ -69,10 +70,7 @@ public class MessageActivity extends AppCompatActivity {
         mClientListener = new MyRtmClientListener();
         mChatManager.registerListener(mClientListener);
 
-        Intent intent = getIntent();
-        mIsPeerToPeerMode = intent.getBooleanExtra(MessageUtil.INTENT_EXTRA_IS_PEER_MODE, true);
-        user = intent.getParcelableExtra(MessageUtil.INTENT_EXTRA_USER_ID);
-        String targetName = intent.getStringExtra(MessageUtil.INTENT_EXTRA_TARGET_NAME);
+        getExtras();
 
         mTitleTextView = findViewById(R.id.message_title);
 
@@ -107,6 +105,13 @@ public class MessageActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mMessageAdapter);
 
         mMsgEditText = findViewById(R.id.message_edittiext);
+    }
+
+    private void getExtras() {
+        Intent intent = getIntent();
+        mIsPeerToPeerMode = intent.getBooleanExtra(MessageUtil.INTENT_EXTRA_IS_PEER_MODE, true);
+        user = intent.getParcelableExtra(MessageUtil.INTENT_EXTRA_USER_ID);
+        targetName = intent.getStringExtra(MessageUtil.INTENT_EXTRA_TARGET_NAME);
     }
 
     /**
@@ -369,7 +374,7 @@ public class MessageActivity extends AppCompatActivity {
         mRtmClient.sendMessageToPeer(mPeerId, message, mChatManager.getSendMessageOptions(), new ResultCallback<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                // do nothing
+
             }
 
             @Override

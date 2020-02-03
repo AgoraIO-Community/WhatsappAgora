@@ -145,9 +145,9 @@ public class VideoActivity extends AppCompatActivity {
     }
 
     private void initUI() {
-        mCallBtn = findViewById(R.id.btn_call);
-        mMuteBtn = findViewById(R.id.btn_mute);
-        mSwitchVoiceBtn = findViewById(R.id.btn_switch_voice);
+        mCallBtn = findViewById(R.id.start_call_end_call_btn);
+        mMuteBtn = findViewById(R.id.audio_mute_audio_unmute_btn);
+        mSwitchVoiceBtn = findViewById(R.id.switch_voice_btn);
 
         mGridVideoViewContainer = findViewById(R.id.grid_video_view_container);
         mGridVideoViewContainer.setItemEventHandler(new RecyclerItemClickListener.OnItemClickListener() {
@@ -163,7 +163,8 @@ public class VideoActivity extends AppCompatActivity {
 
             @Override
             public void onItemDoubleClick(View view, int position) {
-                onBigVideoViewDoubleClicked(view, position);            }
+                onBigVideoViewDoubleClicked(view, position);
+            }
         });
     }
 
@@ -327,12 +328,10 @@ public class VideoActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //todo: remove view
                 Object target = mUidsList.remove(uid);
                 if (target == null) {
                     return;
                 }
-
                 switchToDefaultVideoView();
             }
         });

@@ -27,7 +27,7 @@
         android:layout_marginBottom="@dimen/control_bottom_margin">
 
         <ImageView
-            android:id="@+id/btn_call"
+            android:id="@+id/start_call_end_call_btn"
             android:layout_width="@dimen/call_button_size"
             android:layout_height="@dimen/call_button_size"
             android:onClick="onCallClicked"
@@ -36,11 +36,11 @@
             android:scaleType="centerCrop"/>
 
         <ImageView
-            android:id="@+id/btn_switch_camera"
+            android:id="@+id/switch_camera_btn"
             android:layout_width="@dimen/other_button_size"
             android:layout_height="@dimen/other_button_size"
-            android:layout_toRightOf="@id/btn_call"
-            android:layout_toEndOf="@id/btn_call"
+            android:layout_toRightOf="@id/start_call_end_call_btn"
+            android:layout_toEndOf="@id/start_call_end_call_btn"
             android:layout_marginLeft="@dimen/control_bottom_horizontal_margin"
             android:layout_centerVertical="true"
             android:onClick="onSwitchCameraClicked"
@@ -48,11 +48,11 @@
             android:scaleType="centerCrop"/>
 
         <ImageView
-            android:id="@+id/btn_mute"
+            android:id="@+id/audio_mute_audio_unmute_btn"
             android:layout_width="@dimen/other_button_size"
             android:layout_height="@dimen/other_button_size"
-            android:layout_toLeftOf="@id/btn_call"
-            android:layout_toStartOf="@id/btn_call"
+            android:layout_toLeftOf="@id/start_call_end_call_btn"
+            android:layout_toStartOf="@id/start_call_end_call_btn"
             android:layout_marginRight="@dimen/control_bottom_horizontal_margin"
             android:layout_centerVertical="true"
             android:onClick="onLocalAudioMuteClicked"
@@ -61,11 +61,11 @@
 
 
         <ImageView
-            android:id="@+id/btn_switch_voice"
+            android:id="@+id/switch_voice_btn"
             android:layout_width="@dimen/other_button_size"
             android:layout_height="@dimen/other_button_size"
-            android:layout_toLeftOf="@id/btn_mute"
-            android:layout_toStartOf="@id/btn_mute"
+            android:layout_toLeftOf="@id/audio_mute_audio_unmute_btn"
+            android:layout_toStartOf="@id/audio_mute_audio_unmute_btn"
             android:layout_marginRight="@dimen/control_bottom_horizontal_margin"
             android:layout_centerVertical="true"
             android:onClick="onSwitchVoiceClicked"
@@ -73,11 +73,11 @@
             android:scaleType="centerCrop"/>
 
         <ImageView
-            android:id="@+id/btn_shake"
+            android:id="@+id/video_chat_btn"
             android:layout_width="@dimen/other_button_size"
             android:layout_height="@dimen/other_button_size"
-            android:layout_toRightOf="@id/btn_switch_camera"
-            android:layout_toEndOf="@id/btn_switch_camera"
+            android:layout_toRightOf="@id/switch_camera_btn"
+            android:layout_toEndOf="@id/switch_camera_btn"
             android:layout_marginLeft="@dimen/control_bottom_horizontal_margin"
             android:layout_centerVertical="true"
             android:onClick="onVideoChatClicked"

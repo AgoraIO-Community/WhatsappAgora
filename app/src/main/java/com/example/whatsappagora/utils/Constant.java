@@ -17,10 +17,6 @@ public class Constant {
     }
 
     public static boolean SHOW_VIDEO_INFO = true;
-
-    public static final int BEAUTY_EFFECT_DEFAULT_CONTRAST = 1;
-    public static final float BEAUTY_EFFECT_DEFAULT_LIGHTNESS = .7f;
-    public static final float BEAUTY_EFFECT_DEFAULT_SMOOTHNESS = .5f;
-    public static final float BEAUTY_EFFECT_DEFAULT_REDNESS = .1f;
+    public static final int CHAT_REQUEST_CODE = 1;
 
 }

@@ -111,7 +111,6 @@ public class SelectionActivity extends AppCompatActivity {
         } else if (mIsPeerToPeerMode && mTargetName.equals(user.getFireDisplayName())) {
             showToast(getString(R.string.account_cannot_be_yourself));
         } else {
-            mCallButton.setEnabled(false);
             String channelName = "";
             if (mIsPeerToPeerMode) {
                 channelName = myName.compareTo(mTargetName) < 0 ? myName + mTargetName : mTargetName + myName;

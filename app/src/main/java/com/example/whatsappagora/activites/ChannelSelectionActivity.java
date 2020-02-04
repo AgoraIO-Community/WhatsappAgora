@@ -17,7 +17,7 @@ import com.example.whatsappagora.model.User;
 import com.example.whatsappagora.utils.Constant;
 import com.example.whatsappagora.utils.MessageUtil;
 
-public class SelectionActivity extends AppCompatActivity {
+public class ChannelSelectionActivity extends AppCompatActivity {
 
     private User user;
     private TextView mTitleTextView;
@@ -30,7 +30,7 @@ public class SelectionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_selection);
+        setContentView(R.layout.activity_channel_selection);
 
         initUIAndData();
     }
@@ -118,7 +118,7 @@ public class SelectionActivity extends AppCompatActivity {
             }else {
                 channelName = mTargetName;
             }
-            Intent intent = new Intent(this, VideoActivity.class);
+            Intent intent = new Intent(this, VideoCallActivity.class);
             intent.putExtra("User", user);
             intent.putExtra("Channel", channelName);
             intent.putExtra(MessageUtil.INTENT_EXTRA_IS_PEER_MODE, mIsPeerToPeerMode);

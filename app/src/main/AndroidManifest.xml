@@ -20,8 +20,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activites.SelectionActivity"></activity>
-        <activity android:name=".activites.VideoActivity"/>
+        <activity android:name=".activites.ChannelSelectionActivity"></activity>
+        <activity android:name=".activites.VideoCallActivity"/>
         <activity android:name=".activites.MessageActivity"></activity>
         <activity android:name=".activites.LoginActivity">
             <intent-filter>

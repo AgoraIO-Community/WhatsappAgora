@@ -105,7 +105,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Intent intent = new Intent(LoginActivity.this, SelectionActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, ChannelSelectionActivity.class);
                             intent.putExtra(MessageUtil.INTENT_EXTRA_USER_ID, user);
                             startActivity(intent);
                         }

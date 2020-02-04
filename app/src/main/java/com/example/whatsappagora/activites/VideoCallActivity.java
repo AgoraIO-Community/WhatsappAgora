@@ -40,13 +40,13 @@ import io.agora.rtc.video.VideoCanvas;
 
 import static com.example.whatsappagora.utils.MessageUtil.INTENT_EXTRA_IS_PEER_MODE;
 
-public class VideoActivity extends AppCompatActivity {
+public class VideoCallActivity extends AppCompatActivity {
     public static final int LAYOUT_TYPE_DEFAULT = 0;
     public static final int LAYOUT_TYPE_SMALL = 1;
 
     private String channelName;
     private User user;
-    private static final String TAG = VideoActivity.class.getName();
+    private static final String TAG = VideoCallActivity.class.getName();
     public int mLayoutType = LAYOUT_TYPE_DEFAULT;
     private static final int PERMISSION_REQ_ID = 22;
     RtcEngine mRtcEngine;
@@ -79,7 +79,7 @@ public class VideoActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(VideoActivity.this, "User: " + uid + " join!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(VideoCallActivity.this, "User: " + uid + " join!", Toast.LENGTH_LONG).show();
                     Log.i("agora", "Join channel success, uid: " + (uid & 0xFFFFFFFFL));
                     user.setAgoraUid(uid);
                     SurfaceView localView = mUidsList.remove(0);
@@ -109,7 +109,7 @@ public class VideoActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(VideoActivity.this, "User: " + uid + " left the room.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(VideoCallActivity.this, "User: " + uid + " left the room.", Toast.LENGTH_LONG).show();
                     Log.i("agora", "User offline, uid: " + (uid & 0xFFFFFFFFL));
                     onRemoteUserLeft(uid);
                 }
@@ -126,7 +126,7 @@ public class VideoActivity extends AppCompatActivity {
         if (ab != null) {
             ab.hide();
         }
-        setContentView(R.layout.activity_video);
+        setContentView(R.layout.activity_video_call);
         getExtras();
         initUI();
 
@@ -199,7 +199,7 @@ public class VideoActivity extends AppCompatActivity {
 
                 mUidsList.put(0, surfaceView);
 
-                mGridVideoViewContainer.initViewContainer(VideoActivity.this, 0, mUidsList, mIsLandscape);
+                mGridVideoViewContainer.initViewContainer(VideoCallActivity.this, 0, mUidsList, mIsLandscape);
             }
         });
     }
@@ -356,7 +356,7 @@ public class VideoActivity extends AppCompatActivity {
 
     private void switchToDefaultVideoView() {
 
-        mGridVideoViewContainer.initViewContainer(VideoActivity.this, user.getAgoraUid(), mUidsList, mIsLandscape);
+        mGridVideoViewContainer.initViewContainer(VideoCallActivity.this, user.getAgoraUid(), mUidsList, mIsLandscape);
 
         boolean setRemoteUserPriorityFlag = false;
 
